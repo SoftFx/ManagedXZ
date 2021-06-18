@@ -56,6 +56,7 @@ namespace ManagedXZ
         /// <param name="stream"></param>
         /// <param name="threads">number of threads for parallel compress</param>
         /// <param name="level">0-9, the bigger, the slower, and higher compression ratio</param>
+        /// <param name="leaveOpen">true to leave the stream open after the XZCompressStream object is disposed; otherwise, false.</param>
         public XZCompressStream(Stream stream, int threads, int level, bool leaveOpen = false)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
