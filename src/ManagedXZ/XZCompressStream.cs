@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -55,7 +56,7 @@ namespace ManagedXZ
         /// <param name="stream"></param>
         /// <param name="threads">number of threads for parallel compress</param>
         /// <param name="level">0-9, the bigger, the slower, and higher compression ratio</param>
-        public XZCompressStream(Stream stream, int threads, int level)
+        public XZCompressStream(Stream stream, int threads, int level, bool leaveOpen = false)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanWrite) throw new ArgumentException("stream is not writable");
@@ -65,6 +66,7 @@ namespace ManagedXZ
             _stream = stream;
             _threads = threads;
             _preset = (uint)level;
+            _leaveOpen = leaveOpen;
             Init();
         }
 
@@ -75,6 +77,7 @@ namespace ManagedXZ
         private IntPtr _inbuf;
         private IntPtr _outbuf;
         private const int BUFSIZE = 1024*32; // we do not need a big outbuf
+        private bool _leaveOpen;
 
         private void Init()
         {
@@ -82,7 +85,7 @@ namespace ManagedXZ
             if (ret != lzma_ret.LZMA_OK)
                 throw new Exception($"Can not create lzma stream: {ret}");
 
-            _inbuf = Marshal.AllocHGlobal(BUFSIZE);
+            _inbuf  = Marshal.AllocHGlobal(BUFSIZE);
             _outbuf = Marshal.AllocHGlobal(BUFSIZE);
 
             // init lzma_stream
@@ -133,15 +136,17 @@ namespace ManagedXZ
 
                 // do compress, RUN action should return LZMA_OK on success
                 var ret = Native.lzma_code(_lzma_stream, lzma_action.LZMA_RUN);
+
                 if (ret != lzma_ret.LZMA_OK)
                     throw new Exception($"lzma_code returns {ret}");
 
                 // check output buffer
                 if (_lzma_stream.avail_out == UIntPtr.Zero)
                 {
-                    byte[] data = new byte[BUFSIZE];
-                    Marshal.Copy(_outbuf, data, 0, data.Length);
-                    _stream.Write(data, 0, data.Length);
+                    var data = ArrayPool<byte>.Shared.Rent(BUFSIZE);
+                    Marshal.Copy(_outbuf, data, 0, BUFSIZE);
+                    _stream.Write(data, 0, BUFSIZE);
+                    ArrayPool<byte>.Shared.Return(data);
 
                     // Reset next_out and avail_out.
                     _lzma_stream.next_out = _outbuf;
@@ -150,9 +155,12 @@ namespace ManagedXZ
             }
         }
 
+        bool disposed = false;
+
         protected override void Dispose(bool disposing)
         {
-            if (_stream == null) return;
+            if (disposed) return;
+
             try
             {
                 // compress all remaining data
@@ -166,9 +174,11 @@ namespace ManagedXZ
                     // write output buffer to underlying stream
                     if (_lzma_stream.avail_out == UIntPtr.Zero || ret == lzma_ret.LZMA_STREAM_END)
                     {
-                        byte[] data = new byte[BUFSIZE - (uint)_lzma_stream.avail_out];
-                        Marshal.Copy(_outbuf, data, 0, data.Length);
-                        _stream.Write(data, 0, data.Length);
+                        int size = (int)(BUFSIZE - (uint)_lzma_stream.avail_out);
+                        var data = ArrayPool<byte>.Shared.Rent(size);
+                        Marshal.Copy(_outbuf, data, 0, size);
+                        _stream.Write(data, 0, size);
+                        ArrayPool<byte>.Shared.Return(data);
 
                         // Reset next_out and avail_out.
                         _lzma_stream.next_out = _outbuf;
@@ -181,16 +191,25 @@ namespace ManagedXZ
             }
             finally
             {
+                if (disposing && !_leaveOpen)
+                {
+                    _stream?.Dispose();
+                    _stream = null;
+                }
+
                 Native.lzma_end(_lzma_stream);
                 Marshal.FreeHGlobal(_inbuf);
                 Marshal.FreeHGlobal(_outbuf);
-                _stream.Close();
-                _stream = null;
+
+                disposed = true;
+
+                base.Dispose(disposing);
             }
         }
 
         public override void Flush()
         {
+
         }
 
         public override long Seek(long offset, SeekOrigin origin)
