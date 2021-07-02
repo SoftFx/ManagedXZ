@@ -1,4 +1,4 @@
-﻿using ManagedXZ;
+using ManagedXZ;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -154,8 +154,8 @@ namespace Tests.Integration.ManagedXZ
         }
 
         [TestCase(new byte[0], "0byte.bin.xz", "compress 0byte in memory")]
-        [TestCase(new byte[1] {0}, "1byte.0.bin.xz", "compress 1byte[0x00] in memory")]
-        [TestCase(new byte[1] {1}, "1byte.1.bin.xz", "compress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] { 0 }, "1byte.0.bin.xz", "compress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] { 1 }, "1byte.1.bin.xz", "compress 1byte[0x00] in memory")]
         public void TestCompressInMemory(byte[] input, string xzFilename, string testName)
         {
             var data1 = XZUtils.CompressBytes(input, 0, input.Length);
@@ -178,8 +178,8 @@ namespace Tests.Integration.ManagedXZ
         }
 
         [TestCase(new byte[0], 0, "0byte.bin", "decompress 0byte in memory")]
-        [TestCase(new byte[1] {0}, 1, "1byte.0.bin", "decompress 1byte[0x00] in memory")]
-        [TestCase(new byte[1] {1}, 1, "1byte.1.bin", "decompress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] { 0 }, 1, "1byte.0.bin", "decompress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] { 1 }, 1, "1byte.1.bin", "decompress 1byte[0x00] in memory")]
         public void TestDecompressInMemory(byte[] input, int count, string binFilename, string testName)
         {
             input = XZUtils.CompressBytes(input, 0, count);
