@@ -153,6 +153,41 @@ namespace Tests.Integration.ManagedXZ
             Assert.IsTrue(isSame, testName);
         }
 
+        [TestCase(new byte[0], "0byte.bin.xz", "compress 0byte in memory")]
+        [TestCase(new byte[1] {0}, "1byte.0.bin.xz", "compress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] {1}, "1byte.1.bin.xz", "compress 1byte[0x00] in memory")]
+        public void TestCompressInMemory(byte[] input, string xzFilename, string testName)
+        {
+            var data1 = XZUtils.CompressBytes(input, 0, input.Length);
+            var data2 = File.ReadAllBytes(GetFile(xzFilename));
+            Assert.AreEqual(data1, data2, testName);
+        }
+
+        [TestCase("0byte.bin.xz", "0byte.bin", "decompress 0byte")]
+        [TestCase("1byte.0.bin.xz", "1byte.0.bin", "decompress 1byte[0x00]")]
+        [TestCase("1byte.1.bin.xz", "1byte.1.bin", "decompress 1byte[0x01]")]
+        public void TestDecompressFile(string xzFilename, string binFilename, string testName)
+        {
+            var tmpfile = Path.GetTempFileName();
+            File.Delete(tmpfile);
+            XZUtils.DecompressFile(GetFile(xzFilename), tmpfile);
+            var isSame = CompareFile(GetFile(binFilename), tmpfile);
+            File.Delete(tmpfile);
+
+            Assert.IsTrue(isSame, testName);
+        }
+
+        [TestCase(new byte[0], 0, "0byte.bin", "decompress 0byte in memory")]
+        [TestCase(new byte[1] {0}, 1, "1byte.0.bin", "decompress 1byte[0x00] in memory")]
+        [TestCase(new byte[1] {1}, 1, "1byte.1.bin", "decompress 1byte[0x00] in memory")]
+        public void TestDecompressInMemory(byte[] input, int count, string binFilename, string testName)
+        {
+            input = XZUtils.CompressBytes(input, 0, count);
+            var data1 = XZUtils.DecompressBytes(input, 0, input.Length);
+            var data2 = File.ReadAllBytes(GetFile(binFilename));
+
+            Assert.AreEqual(data1, data2, testName);
+        }
 
         private bool BytesEqual(byte[] arr1, byte[] arr2)
         {
