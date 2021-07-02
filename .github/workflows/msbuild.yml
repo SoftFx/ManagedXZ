@@ -33,4 +33,4 @@ jobs:
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
-      working-directory: src/ManagedXZ.Tests/
+      working-directory:  ${{env.SOLUTION_FILE_PATH}}/ManagedXZ.Tests/
