@@ -32,5 +32,5 @@ jobs:
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}  /p:Platform="Any CPU"
       
     - name: Test
-      run: dotnet test --verbosity normal
+      run: dotnet test --verbosity normal --framework net472
       working-directory:  ${{env.SOLUTION_FILE_PATH}}/Tests/
