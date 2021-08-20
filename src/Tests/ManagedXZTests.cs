@@ -139,6 +139,51 @@ namespace Tests.Integration.ManagedXZ
             Assert.AreEqual(res, result);
         }
 
+        [TestCase(1)]
+        public void CompressMultiMemoryStreamTest(int threads)
+        {
+            string text = "12381293diushfidshf7sy982394239hdeuhd9932n3b0abh213bdsdc098h23ubcfuisbcv907h20uib0ub";
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(text);
+            sb.AppendLine(text);
+            sb.AppendLine(text);
+            sb.AppendLine(text);
+            sb.AppendLine(text);
+            var res = sb.ToString();
+
+            // create a new xz file
+            var fs = new MemoryStream();
+            using (var xz = new XZCompressStream(fs, threads, 9, true))
+            using (var writer = new StreamWriter(xz, Encoding.UTF8))
+            {
+                writer.WriteLine(text);
+                writer.WriteLine(text);
+                writer.WriteLine(text);
+            }
+
+            // open the same xz file and append new data
+            using (var xz = new XZCompressStream(fs, threads, 9, true))
+            using (var writer = new StreamWriter(xz, new UTF8Encoding(false, true))) // append data should go without BOM
+            {
+                writer.WriteLine(text);
+                writer.WriteLine(text);
+            }
+
+            string result;
+
+            fs.Seek(0, SeekOrigin.Begin);
+            using (var dec = new XZDecompressStream(fs))
+            using (var reader = new StreamReader(dec))
+            {
+                result = reader.ReadToEnd();
+            }
+
+            fs.Dispose();
+
+            Assert.AreEqual(res, result);
+        }
+
 
         [TestCase("0byte.bin", "0byte.bin.xz", "compress 0byte")]
         [TestCase("1byte.0.bin", "1byte.0.bin.xz", "compress 1byte[0x00]")]
