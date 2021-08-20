@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Version>1.0.3</Version>
     <Authors>goldenbull@gmail.com, Siarhei Hanich</Authors>
-    <Company>Soft-Fx</Company>
+    <Company>Soft-Fx</Company> 
+    <PackageId>SoftFx.ManagedXZ</PackageId>
     <Description>a .net wrapper of liblzma.dll from xz utils. Both x86 and x64 compatible.</Description>
     <PackageTags>xz lzma lzma2 compress</PackageTags>
     <PackageProjectUrl>https://github.com/SoftFx/ManagedXZ</PackageProjectUrl>
