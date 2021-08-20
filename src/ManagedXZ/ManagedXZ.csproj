@@ -2,19 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.2</Version>
-    <Authors>goldenbull@gmail.com</Authors>
-    <Company />
+    <Version>1.0.3</Version>
+    <Authors>goldenbull@gmail.com, Siarhei Hanich</Authors>
+    <Company>Soft-Fx</Company>
     <Description>a .net wrapper of liblzma.dll from xz utils. Both x86 and x64 compatible.</Description>
     <PackageTags>xz lzma lzma2 compress</PackageTags>
-    <PackageProjectUrl>https://github.com/goldenbull/ManagedXZ</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/SoftFx/ManagedXZ</PackageProjectUrl>
     <PackageReleaseNotes>bugfix. move to netstandard.</PackageReleaseNotes>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>cert.snk</AssemblyOriginatorKeyFile>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageIcon>compress.png</PackageIcon>
-    <PackageIconUrl />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
