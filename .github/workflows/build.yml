@@ -24,8 +24,8 @@ jobs:
       run: dotnet build --no-restore
       working-directory: src/
     - name: Test x64
-      run: dotnet test --no-build --verbosity normal --framework net5.0 --runtime win-x64
+      run: dotnet test --verbosity normal --framework net5.0 --runtime win-x64
       working-directory: src/Tests/
     - name: Test x86
-      run: dotnet test --no-build --verbosity normal --framework net5.0 --runtime win-x86
+      run: dotnet test --verbosity normal --framework net5.0 --runtime win-x86
       working-directory: src/Tests/
