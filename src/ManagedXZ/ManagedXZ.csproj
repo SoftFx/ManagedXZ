@@ -12,6 +12,8 @@
     <PackageReleaseNotes>bugfix. move to netstandard.</PackageReleaseNotes>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageIcon>compress.png</PackageIcon>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,17 +26,17 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="build\" />
-  </ItemGroup>
   
   <ItemGroup>
     <NativeLibs Include="$(MSBuildThisFileDirectory)build\*.dll" />
-    <None Include="@(NativeLibs)">
+    <None Remove="build\liblzma_amd64.dll" />
+    <None Remove="build\liblzma_x86.dll" />
+    <EmbeddedResource Include="build\liblzma_amd64.dll" />
+    <EmbeddedResource Include="build\liblzma_x86.dll" />
+    <Resource Include="@(NativeLibs)">
       <Link>%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   
   <ItemGroup>
