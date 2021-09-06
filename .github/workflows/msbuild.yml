@@ -31,6 +31,10 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}  /p:Platform="Any CPU"
       
-    - name: Test
-      run: dotnet test --verbosity normal --framework net472
+    - name: Test x86
+      run: dotnet test --verbosity normal --framework net472 --arch x86
+      working-directory:  ${{env.SOLUTION_FILE_PATH}}/Tests/
+      
+    - name: Test x64
+      run: dotnet test --verbosity normal --framework net472 --arch x64
       working-directory:  ${{env.SOLUTION_FILE_PATH}}/Tests/
