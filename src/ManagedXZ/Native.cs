@@ -7,27 +7,11 @@ namespace ManagedXZ
 {
     internal static class Native
     {
-        public static bool Is64Bit;
+        //public static bool Is64Bit;
 
         static Native()
         {
-            // check 32bit or 64bit
-            PortableExecutableKinds peKinds;
-            ImageFileMachine arch;
-            typeof(object).Module.GetPEKind(out peKinds, out arch);
-            string resourceName;
-            if (arch == ImageFileMachine.AMD64)
-            {
-                resourceName = "ManagedXZ.build.liblzma_amd64.dll";
-                Is64Bit = true;
-            }
-            else if (arch == ImageFileMachine.I386)
-            {
-                resourceName = "ManagedXZ.build.liblzma_x86.dll";
-                Is64Bit = false;
-            }
-            else
-                throw new Exception(arch + " is not supported yet");
+            string resourceName = Environment.Is64BitProcess ? "ManagedXZ.build.liblzma_amd64.dll" : "ManagedXZ.build.liblzma_x86.dll";
 
             var assembly = Assembly.GetExecutingAssembly();
             var path = Path.Combine(Path.GetDirectoryName(assembly.Location), "liblzma.dll");
